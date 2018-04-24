@@ -44,4 +44,13 @@ CREATE TABLE products
 
 ALTER TABLE products
 ADD product_sale DECIMAL (10,2);
+
+SELECT COALESCE(product_sale, 0 ) FROM products
   
+INSERT INTO departments
+    (department_name,over_head_costs)
+  VALUES
+    ("Electronics", 550.00),
+    ("Stationary", 20.00),
+    ("Kitchen", 23.50),
+    ("Furniture", 120.00)

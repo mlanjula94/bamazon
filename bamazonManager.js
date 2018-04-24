@@ -152,10 +152,9 @@ function chekIfExists(item) {
     product_name: item
   }], function (err, res) {
     if (err) throw err;
-    if (res.length > 0) return true;
-    else return false;
+    if (res.length > 0) console.log("true");
+    else console.log("false");
   })
-
 }
 
 function checkIfContinuing() {

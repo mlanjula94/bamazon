@@ -30,11 +30,11 @@ function afterConnection() {
     }
 
     //connection.end();
-    buyProducts();
+    buyProducts(res);
   });
 }
 
-function buyProducts() {
+function buyProducts(productsTable) {
   inquirer
     .prompt([{
         name: "id",
@@ -49,55 +49,46 @@ function buyProducts() {
     ])
     .then(function (answer) {
       // when finished prompting, insert a new item into the db with that inf
-      let total =async function(){ getTotal(answer.id, answer.quantity).then(function(value){
-        connection.query("SELECT price FROM products WHERE ?", [{
-          item_id: answer.id
-        }], function (err, result, fields) {
-          if (err) throw err;
-          var total = parseFloat(result[0].price) * answer.quantity;
-          //console.log(total);
-          return (total);
-        });
-      });
-      }
-      total();
-      var sql = "UPDATE products SET stock_quantity = stock_quantity - " + parseInt(answer.quantity) + ", product_sale = product_sale +" + total() + " WHERE item_id = " + parseInt(answer.id) + " AND stock_quantity > " + parseInt(answer.quantity);
-      console.log(sql);
-      connection.query(
-        sql,
-        function (err, res) {
-          if (err) console.log(err);
-          if (res.affectedRows === 0) {
-            console.log("Please select a lower quantity than " + res.stock_quantity);
-            buyProducts();
-          } else {
-            showTotal(parseInt(answer.id), parseInt(answer.quantity))
-          }
+      var total = 0;
+
+      for(var i = 0; i < productsTable.length; i++){
+        if(parseInt(productsTable[i].item_id) === parseInt(answer.id)){
+          total = parseFloat(productsTable[i].price)*parseInt(answer.quantity);
         }
-      );
+      }
+      console.log(total); 
+      
+      var sql = "UPDATE products SET stock_quantity = stock_quantity - " + parseInt(answer.quantity) + ", product_sale = product_sale +" + total + " WHERE item_id = " + parseInt(answer.id) + " AND stock_quantity > " + parseInt(answer.quantity);
+      console.log(sql);
+       connection.query(
+         sql,
+         function (err, res) {
+           if (err) console.log(err);
+           if (res.affectedRows === 0) {
+             console.log("Please select a lower quantity than " + res.stock_quantity);
+             buyProducts();
+           } else {
+            console.log("Your total is $" + total+"\n");
+            checkIfContinuing();
+           }
+         }
+       );
     });
 }
 
-function showTotal(id, quantity_bought) {
-  connection.query("SELECT price FROM products WHERE ?", [{
-    item_id: id
-  }], function (err, result, fields) {
-    if (err) throw err;
-    var total = parseFloat(result[0].price) * quantity_bought;
 
-    console.log("Your total is $" + total);
+
+
+function checkIfContinuing() {
+  inquirer.prompt([{
+  type: "list",
+  name: "checker",
+  choices: ["Yes","No"],
+  message: "Do you wish to continue"
+  }]).then (function(answer){
+    if(answer.checker ==="Yes"){
+      afterConnection();
+    }
+    else process.exit();
   });
-}
-
-async function getTotal(id, quantity_bought) {
-
-  connection.query("SELECT price FROM products WHERE ?", [{
-    item_id: id
-  }], function (err, result, fields) {
-    if (err) throw err;
-    var total = parseFloat(result[0].price) * quantity_bought;
-    //console.log(total);
-    return (total);
-  });
-
 }
