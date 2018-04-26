@@ -56,10 +56,9 @@ function buyProducts(productsTable) {
           total = parseFloat(productsTable[i].price)*parseInt(answer.quantity);
         }
       }
-      console.log(total); 
       
       var sql = "UPDATE products SET stock_quantity = stock_quantity - " + parseInt(answer.quantity) + ", product_sale = product_sale +" + total + " WHERE item_id = " + parseInt(answer.id) + " AND stock_quantity > " + parseInt(answer.quantity);
-      console.log(sql);
+
        connection.query(
          sql,
          function (err, res) {

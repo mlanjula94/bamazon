@@ -48,7 +48,7 @@ function managerChoices() {
 }
 
 function viewProducts() {
-  connection.query("SELECT item_id,product_name, price, stock_quantity FROM products", function (err, res) {
+  connection.query("SELECT * FROM products", function (err, res) {
     if (err) throw err;
     console.log("\n| id  |  Product Name  | Price ($)  |  stock quantity |  product sale  ");
 
@@ -97,7 +97,6 @@ function addInventory() {
       }
     ]).then(function (answer) {
       var sql = "UPDATE products SET stock_quantity = stock_quantity + " + parseInt(answer.quantity) + " WHERE product_name = '" + answer.item + "'";
-      console.log(sql);
       connection.query(
         sql,
         function (err, res) {
@@ -138,7 +137,7 @@ function addProduct() {
       
     } else {
       var sql = "INSERT INTO products (product_name,department_name,price,stock_quantity) VALUES ('" + answer.item + "','" + answer.dept + "','" + answer.price + "','" + answer.quantity + "')";
-      console.log(sql);
+    
       connection.query(sql, function (err, res) {
         viewProducts();
         
